@@ -1,4 +1,5 @@
-class Solution:
+from typing import List
+class SolutionthreeSum:
     def threeSum(self, nums: List[int]) -> List[List[int]]:
         res = []
         nums.sort()

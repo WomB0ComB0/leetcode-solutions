@@ -1,14 +1,14 @@
 # Solution 1 - Brute Force
 # class Solution:
-    # def isPalindrome(self, s: str) -> bool:
-        # newStr = ""
-        # for c in s:
-            # if c.isalnum():
-                # newStr += c.lower()
-        # return newStr == newStr[::-1]
+# def isPalindrome(self, s: str) -> bool:
+# newStr = ""
+# for c in s:
+# if c.isalnum():
+# newStr += c.lower()
+# return newStr == newStr[::-1]
 # Solution 2 - Two Pointers
 # ord - returns an integer representing the Unicode character
-class Solution:
+class SolutionisPalindrome:
     def isPalindrome(self, s: str) -> bool:
         l,r = 0, len(s) - 1
         while l < r:

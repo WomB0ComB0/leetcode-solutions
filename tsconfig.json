@@ -1,0 +1,24 @@
+// https://bun.sh/docs/typescript
+{
+  "compilerOptions": {
+    "types": ["bun-types", "node", "jest"],
+
+    "lib": ["ESNext"],
+    "module": "esnext",
+    "target": "esnext",
+
+    "moduleResolution": "node",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+
+    "allowJs": true,
+
+    "strict": false, // Should be true, but don't care much in AoC
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
