@@ -2,7 +2,6 @@ from typing import List
 
 from typing import List
 
-
 class DSU:
     def __init__(self, n: int):
         self.parent = list(range(n))
@@ -39,3 +38,15 @@ class Solution:
         if dsu[0].get_size(1) < n or dsu[1].get_size(1) < n:
             return -1
         return res
+"""
+class Node:
+    def __init__(self, value, next=None) -> None:
+        self.value = value
+        self.next = next
+    def __repr__(self) -> str:
+        return f"{self.value} -> {self.next}"
+
+class Solution:
+    def passThePillow(self, n: int, time: int) -> int:
+        rng: Node = 
+"""
