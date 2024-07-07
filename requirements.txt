@@ -1,7 +1,4 @@
 numpy
-scipy
-networkx
 sympy
-matplotlib
 pandas
-pytest
+big_o
