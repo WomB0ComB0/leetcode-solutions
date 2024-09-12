@@ -1,5 +1,6 @@
 from typing import List
 
+
 class Solution:
     def sortArray(self, nums: List[int]) -> List[int]:
         # Base case: if the array has 1 or fewer elements, it's already sorted

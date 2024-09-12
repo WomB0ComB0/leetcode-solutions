@@ -2,6 +2,7 @@ from typing import List
 
 from typing import List
 
+
 class DSU:
     def __init__(self, n: int):
         self.parent = list(range(n))

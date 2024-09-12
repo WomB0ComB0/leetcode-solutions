@@ -1,8 +1,11 @@
 # Given a non-negative integers representing an elevation map where the width of each bar is 1, computer how much water it can trap after raining
 from typing import List
+
+
 class Solutiontrap:
     def trap(self, height: List[int]) -> int:
-        if not height: return 0
+        if not height:
+            return 0
         l, r = 0, len(height) - 1
         leftMax, rightMax = height[l], height[r]
         res = 0

@@ -2,13 +2,14 @@ from typing import List, Tuple
 import heapq
 from math import inf
 
+
 class Solution:
     def findTheCity(
         self, n: int, edges: List[List[int]], distanceThreshold: int
     ) -> int:
         """
         Input: n cities, edges, distanceThreshold
-                  
+
         [0]---5---[1]
         | \       |
         |  \      |
