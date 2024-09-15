@@ -1,4 +1,6 @@
 from typing import List
+
+
 class SolutionthreeSum:
     def threeSum(self, nums: List[int]) -> List[List[int]]:
         res = []
@@ -6,8 +8,8 @@ class SolutionthreeSum:
         for i, a in enumerate(nums):
             if i > 0 and a == nums[i - 1]:
                 continue
-            l,r = i + 1, len(nums) -1
-            while l <  r:
+            l, r = i + 1, len(nums) - 1
+            while l < r:
                 threeSum = a + nums[l] + nums[r]
                 if threeSum > 0:
                     r -= 1

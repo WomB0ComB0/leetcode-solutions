@@ -33,6 +33,7 @@ Constraints:
     2 <= s.length <= 100
     s consists only of digits.
 """
+
 from typing import List
 
 

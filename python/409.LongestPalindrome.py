@@ -1,4 +1,6 @@
 from collections import Counter
+
+
 class SolutionlongestPalindrome:
     def longestPalindrome(self, s: str) -> int:
         counter = Counter(s)

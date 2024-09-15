@@ -36,14 +36,15 @@ def main() -> None:
     ]
 
     for grid in grids:
-        print(solution.numberOfSubmatrices(grid)) 
-        
+        print(solution.numberOfSubmatrices(grid))
+
     def generate_test_case(n: int) -> List[List[str]]:
         return [["X", "Y", "."] * n for _ in range(n)]
 
     func = solution.numberOfSubmatrices
     best, _ = big_o.big_o(func, generate_test_case)
     print(f"Best: {best}")
+
 
 if __name__ == "__main__":
     main()

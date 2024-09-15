@@ -1,5 +1,6 @@
 from typing import List
 
+
 class Solution:
     def sortJumbled(self, mapping: List[int], nums: List[int]) -> List[int]:
         # Convert original numbers to their mapped values
@@ -18,9 +19,9 @@ class Solution:
         N: int = len(new_nums)
         for i in range(N):
             sorted_nums.append((new_nums[i], i, nums[i]))
-        
+
         # Sort based on mapped values, then by original index
         sorted_nums.sort()
-        
+
         # Return the original numbers in the new sorted order
         return [x[2] for x in sorted_nums]

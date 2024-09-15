@@ -1,6 +1,7 @@
 from typing import List
 import heapq
 
+
 class Solution:
     def maximumPoints(self, enemyEnergies: List[int], currentEnergy: int) -> int:
         enemyEnergies.sort()
@@ -27,6 +28,7 @@ class Solution:
             else:
                 break
         return points
+
 
 if __name__ == "__main__":
     solution = Solution()

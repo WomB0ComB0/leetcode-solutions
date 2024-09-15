@@ -1,5 +1,6 @@
 from typing import List
 
+
 class Solution:
     def averageWaitingTime(self, customers: List[List[int]]) -> float:
         N: int = len(customers)
@@ -12,7 +13,8 @@ class Solution:
             finish - arrival for finish, (arrival, _) in zip(finish_times, customers)
         ]
         return sum(wait_times) / N
-    
+
+
 def main() -> None:
     customers = [[1, 2], [2, 5], [4, 3]]
     print(Solution().averageWaitingTime(customers))

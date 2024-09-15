@@ -1,4 +1,6 @@
 from typing import List
+
+
 class Solution:
     def numberOfAlternatingGroups(self, colors: List[int], k: int) -> int:
         n = len(colors)
@@ -22,6 +24,7 @@ class Solution:
                 count += 1
 
         return count
+
 
 if __name__ == "__main__":
     solution = Solution()
