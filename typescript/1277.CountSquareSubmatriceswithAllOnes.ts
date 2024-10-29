@@ -10,8 +10,8 @@ export function countSquares(matrix: number[][]): number {
 
     // Get the number of rows and columns in the matrix
     const
-      rows = matrix.length,
-      cols = matrix[0].length;
+      rows: number = matrix.length,
+      cols: number = matrix[0].length;
 
     // Initialize a 2D array to store the size of the largest square submatrix ending at each cell
     const dp: number[][] = Array.from({ length: rows }, () => Array(cols).fill(0));
@@ -20,8 +20,8 @@ export function countSquares(matrix: number[][]): number {
     let total_squares: number = 0;
 
     // Iterate through each cell in the matrix
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
+    for (let i: number = 0; i < rows; i++) {
+      for (let j: number = 0; j < cols; j++) {
         // If the current cell contains a 1
         if (matrix[i][j] === 1) {
           // If the cell is in the first row or first column, it can only form a square of size 1
