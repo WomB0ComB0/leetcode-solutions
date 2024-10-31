@@ -32,7 +32,7 @@ class Solution:
             """
             directions: List[Tuple[int, int]] = [
                 (ri - 1, cj + 1),  # Move to the top-right cell.
-                (ri, cj + 1),      # Move to the right cell.
+                (ri, cj + 1),  # Move to the right cell.
                 (ri + 1, cj + 1),  # Move to the bottom-right cell.
             ]
             max_moves = 0

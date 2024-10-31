@@ -1,16 +1,17 @@
 from typing import List
 
+
 class Solution:
     def countSquares(self, matrix: List[List[int]]) -> int:
         if not matrix:
             return 0
-          
-        # Get the number of rows and columns in the matrix 
+
+        # Get the number of rows and columns in the matrix
         (rows, cols) = (len(matrix), len(matrix[0]))
-        
+
         # Initialize a 2D list to store the number of squares ending at each cell
         dp: List[List[int]] = [[0] * cols for _ in range(rows)]
-        
+
         # Initialize the total number of squares
         total_squares: int = 0
 

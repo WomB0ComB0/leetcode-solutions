@@ -6,7 +6,7 @@ class Solution:
             "!": lambda x, y: not x,
         }
 
-        match = lambda c: True if c == 't' else (False if c == 'f' else '(')
+        match = lambda c: True if c == "t" else (False if c == "f" else "(")
 
         ops = []
         booleans = []
@@ -14,19 +14,18 @@ class Solution:
             if c in operands:
                 ops.append(c)
 
-            elif c == ')':
+            elif c == ")":
                 res = booleans[-1]
                 booleans.pop()
 
                 operand = ops.pop()
-                while booleans[-1] != '(':
+                while booleans[-1] != "(":
                     res = operands[operand](res, booleans.pop())
-                
+
                 booleans.pop()
                 booleans.append(operands[operand](res, res))
 
-            elif c != ',':
+            elif c != ",":
                 booleans.append(match(c))
-            
-        
+
         return booleans[-1]
