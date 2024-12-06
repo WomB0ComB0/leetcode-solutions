@@ -2,7 +2,25 @@ import axios from 'axios';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-async function fetchProblems() {
+/**
+ * Interface representing a LeetCode problem returned from the API
+ * @interface
+ */
+interface LeetCodeProblem {
+  /** The title of the problem */
+  title: string;
+  /** The difficulty level (Easy, Medium, Hard) */
+  difficulty: string;
+  /** The URL-friendly slug version of the title */
+  titleSlug: string;
+}
+
+/**
+ * Fetches the list of problems from LeetCode's GraphQL API
+ * @returns {Promise<LeetCodeProblem[]>} Array of LeetCode problems with title, difficulty and slug
+ * @throws {Error} If the API request fails
+ */
+async function fetchProblems(): Promise<LeetCodeProblem[]> {
   const url = 'https://leetcode.com/graphql';
   const query = {
     query: `
@@ -44,13 +62,32 @@ async function fetchProblems() {
   }
 }
 
-async function sortProblemsByDifficulty(problems: any[]) {
+/**
+ * Sorts an array of LeetCode problems by difficulty level
+ * @param {LeetCodeProblem[]} problems - Array of problems to sort
+ * @returns {Promise<void>}
+ */
+async function sortProblemsByDifficulty(problems: LeetCodeProblem[]): Promise<void> {
   const difficultyOrder = ['Easy', 'Medium', 'Hard'];
   problems.sort((a, b) => difficultyOrder.indexOf(a.difficulty) - difficultyOrder.indexOf(b.difficulty));
 }
 
-async function createSortedFiles(problems: any[]) {
-  const languages = {
+/**
+ * Interface mapping programming languages to their file extensions
+ * @interface
+ */
+interface LanguageExtensions {
+  [key: string]: string;
+}
+
+/**
+ * Creates empty solution files for each problem across multiple programming languages
+ * @param {LeetCodeProblem[]} problems - Array of problems to create files for
+ * @returns {Promise<void>}
+ * @throws {Error} If file operations fail
+ */
+async function createSortedFiles(problems: LeetCodeProblem[]): Promise<void> {
+  const languages: LanguageExtensions = {
     python: 'py',
     typescript: 'ts',
     javascript: 'js',
@@ -87,14 +124,26 @@ async function createSortedFiles(problems: any[]) {
   }
 }
 
-async function main() {
+/**
+ * Main execution function that orchestrates the problem fetching, sorting and file creation
+ * @returns {Promise<void>}
+ */
+async function main(): Promise<void> {
   const problems = await fetchProblems();
   await sortProblemsByDifficulty(problems);
   await createSortedFiles(problems);
 }
 
+/**
+ * Class that provides a static interface for running the problem processing pipeline
+ */
 class Problems {
-  static async run() {
+  /**
+   * Executes the main problem processing pipeline
+   * @returns {Promise<void>}
+   * @throws {Error} If any step in the pipeline fails
+   */
+  static async run(): Promise<void> {
     await main();
   }
 }

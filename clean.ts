@@ -1,25 +1,45 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
+/**
+ * Utility class for cleaning and standardizing filenames across programming language directories.
+ * Handles conversion to kebab-case, roman numeral suffixes, and ensures unique filenames.
+ */
 class FilenameCleaner {
+  /** List of programming language directories to process */
   private static readonly PROGRAMMING_DIRECTORIES = [
     'python', 'typescript', 'javascript', 'java', 'cpp', 'c', 
     'csharp', 'dart', 'php', 'go', 'rust', 
     'ruby', 'swift', 'kotlin'
   ];
 
+  /**
+   * Converts a string to kebab-case format.
+   * @param str - The input string to convert
+   * @returns The kebab-cased string with only alphanumeric characters and hyphens
+   */
   private static toKebabCase(str: string): string {
     return str
-      .replace(/([a-z])([A-Z])/g, '$1-$2')
-      .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9-]/g, '')
+      .replace(/([a-z])([A-Z])/g, '$1-$2') // Convert camelCase to kebab-case
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/[^a-zA-Z0-9-]/g, '') // Remove non-alphanumeric characters except hyphens
       .toLowerCase();
   }
 
+  /**
+   * Checks if a string is already in valid kebab-case format.
+   * @param str - The string to validate
+   * @returns True if the string is valid kebab-case, false otherwise
+   */
   private static isKebabCase(str: string): boolean {
     return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(str);
   }
 
+  /**
+   * Converts a number to its Roman numeral representation.
+   * @param num - The number to convert (must be positive)
+   * @returns The Roman numeral string, or empty string if num <= 0
+   */
   private static toRoman(num: number): string {
     if (num <= 0) return '';
     const romanNumerals: [string, number][] = [
@@ -37,6 +57,16 @@ class FilenameCleaner {
     }, '');
   }
 
+  /**
+   * Processes a single directory, cleaning and standardizing all filenames within it.
+   * - Converts filenames to kebab-case
+   * - Converts numeric suffixes to Roman numerals
+   * - Ensures unique filenames by adding numbered suffixes if needed
+   * - Preserves file extensions
+   * 
+   * @param directory - The full path to the directory to process
+   * @throws Error if directory operations fail
+   */
   static async cleanFilenames(directory: string): Promise<void> {
     try {
       const entries = await fs.readdir(directory, { withFileTypes: true });
@@ -86,6 +116,13 @@ class FilenameCleaner {
     }
   }
 
+  /**
+   * Main entry point for the filename cleaning process.
+   * Processes all configured programming language directories in parallel.
+   * 
+   * @param baseDirectory - The root directory containing language subdirectories (defaults to current working directory)
+   * @throws Error if the overall process fails
+   */
   static async run(baseDirectory: string = process.cwd()): Promise<void> {
     console.time('Filename Cleaning Duration');
     

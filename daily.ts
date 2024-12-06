@@ -1,11 +1,24 @@
+/**
+ * @fileoverview Fetches and processes the daily LeetCode challenge, creating solution files across multiple languages
+ */
+
 import { promises as fs } from 'fs';
 import axios from 'axios';
 import path from 'path';
 
+/**
+ * Converts a string to kebab-case format
+ * @param {string} str - The input string to convert
+ * @returns {Promise<string>} The kebab-cased string with only lowercase letters, numbers and hyphens
+ */
 async function toKebabCase(str: string): Promise<string> {
   return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
+/**
+ * Fetches the daily LeetCode challenge and creates solution files in multiple languages
+ * @throws {Error} If the API request fails or file operations fail
+ */
 async function getDailyLeetcodeChallenge() {
   const url = 'https://leetcode.com/graphql';
   const query = {
@@ -46,6 +59,10 @@ async function getDailyLeetcodeChallenge() {
 
     const kebabTitle = await toKebabCase(title);
 
+    /**
+     * Mapping of programming languages to their file extensions
+     * @type {Object.<string, string>}
+     */
     const extensions: { [key: string]: string } = {
       python: 'py',
       typescript: 'ts',
@@ -98,12 +115,23 @@ async function getDailyLeetcodeChallenge() {
   }
 }
 
+/**
+ * Main class to handle daily LeetCode challenge operations
+ * @class
+ */
 class Daily {
+  /**
+   * Executes the daily LeetCode challenge processing
+   * @static
+   * @async
+   * @returns {Promise<void>}
+   */
   static async run() {
     await getDailyLeetcodeChallenge();
   }
 }
 
+// Execute if this is the main module
 if (require.main === module) {
   Daily.run().catch(console.error);
 }

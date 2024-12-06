@@ -1,4 +1,4 @@
-from typing import Set
+from typing import Set, List
 class Solution:
     def maxCount(self, banned: List[int], n: int, maxSum: int) -> int:
         b: Set[int] = set(banned)

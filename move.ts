@@ -1,19 +1,42 @@
+/**
+ * @fileoverview Utility for sorting LeetCode problem files into difficulty-based directories.
+ * Fetches problem metadata from LeetCode's GraphQL API and organizes local solution files.
+ */
+
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import path from 'path';
 
+/**
+ * Represents a LeetCode problem with essential metadata.
+ * @interface LeetCodeProblem
+ * @property {string} titleSlug - The URL-friendly title of the problem
+ * @property {string} difficulty - The difficulty level of the problem (easy/medium/hard)
+ */
 interface LeetCodeProblem {
   titleSlug: string;
   difficulty: string;
 }
 
+/**
+ * Handles fetching LeetCode problem metadata and sorting solution files by difficulty.
+ * @class ProblemSorter
+ */
 class ProblemSorter {
+  /** GraphQL endpoint for LeetCode's API */
   private static readonly LEETCODE_GRAPHQL_URL = 'https://leetcode.com/graphql';
+
+  /** Supported programming language directories to process */
   private static readonly PROGRAMMING_DIRECTORIES = [
     'python', 'typescript', 'javascript', 'java', 'cpp', 'c', 'c#', 
     'c++', 'dart', 'php', 'csharp', 'go', 'rust', 'ruby', 'swift', 'kotlin'
   ];
 
+  /**
+   * Fetches all problems from LeetCode's GraphQL API.
+   * @returns {Promise<LeetCodeProblem[]>} Array of problem metadata
+   * @throws {Error} If the API request fails
+   */
   static async fetchAllProblems(): Promise<LeetCodeProblem[]> {
     const query = {
       query: `
@@ -55,6 +78,13 @@ class ProblemSorter {
     }
   }
 
+  /**
+   * Sorts problem solution files into difficulty-based subdirectories.
+   * @param {string} baseDirectory - Root directory containing language folders
+   * @param {LeetCodeProblem[]} problems - Array of problem metadata from LeetCode
+   * @returns {Promise<void>}
+   * @throws {Error} If file operations fail
+   */
   static async sortProblemFiles(baseDirectory: string, problems: LeetCodeProblem[]): Promise<void> {
     // Create difficulty map for efficient lookup
     const difficultyMap = new Map(
@@ -107,6 +137,12 @@ class ProblemSorter {
     }
   }
 
+  /**
+   * Main execution method that orchestrates the problem sorting process.
+   * @param {string} [baseDirectory=process.cwd()] - Root directory to process
+   * @returns {Promise<void>}
+   * @throws {Error} If the sorting process fails
+   */
   static async run(baseDirectory: string = process.cwd()): Promise<void> {
     console.time('Problem Sorting Duration');
     
