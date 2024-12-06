@@ -4,18 +4,9 @@ import path from 'path';
 class FilenameCleaner {
   private static readonly PROGRAMMING_DIRECTORIES = [
     'python', 'typescript', 'javascript', 'java', 'cpp', 'c', 
-    'c#', 'c++', 'dart', 'php', 'csharp', 'go', 'rust', 
+    'csharp', 'dart', 'php', 'go', 'rust', 
     'ruby', 'swift', 'kotlin'
   ];
-
-  private static sanitizeFileName(fileName: string): string {
-    // Handle LeetCode-style filenames like "1310.XORQueriesOfASubarray"
-    const parts = fileName.split('.');
-    if (parts.length > 1 && /^\d+$/.test(parts[0])) {
-      return parts.slice(1).join('.');
-    }
-    return fileName;
-  }
 
   private static toKebabCase(str: string): string {
     return str
@@ -25,21 +16,52 @@ class FilenameCleaner {
       .toLowerCase();
   }
 
+  private static toRoman(num: number): string {
+    if (num <= 0) return '';
+    const romanNumerals: [string, number][] = [
+      ['M', 1000], ['CM', 900], ['D', 500], ['CD', 400],
+      ['C', 100], ['XC', 90], ['L', 50], ['XL', 40],
+      ['X', 10], ['IX', 9], ['V', 5], ['IV', 4], ['I', 1]
+    ];
+
+    return romanNumerals.reduce((result, [roman, value]) => {
+      while (num >= value) {
+        result += roman;
+        num -= value;
+      }
+      return result;
+    }, '');
+  }
+
   static async cleanFilenames(directory: string): Promise<void> {
     try {
-      const files = await fs.readdir(directory);
+      const entries = await fs.readdir(directory, { withFileTypes: true });
       const seenNames = new Set<string>();
 
-      for (const file of files) {
+      for (const entry of entries) {
+        if (!entry.isFile()) continue;
+
+        const file = entry.name;
         const ext = path.extname(file);
         const baseName = path.basename(file, ext);
-        const sanitizedName = this.sanitizeFileName(baseName);
-        const kebabName = this.toKebabCase(sanitizedName);
+        const parts = baseName.split('.');
+        const namePart = parts.slice(1).join('.'); 
+        const kebabName = this.toKebabCase(namePart);
 
-        let uniqueName = kebabName;
+        const postfixMatch = kebabName.match(/-(\d+)$/);
+        let finalName = kebabName;
+        if (postfixMatch) {
+          const number = parseInt(postfixMatch[1], 10);
+          if (number > 0) {
+            const roman = this.toRoman(number);
+            finalName = kebabName.replace(/-\d+$/, `-${roman}`);
+          }
+        }
+
+        let uniqueName = finalName;
         let counter = 1;
-        while (seenNames.has(uniqueName)) {
-          uniqueName = `${kebabName}-${counter}`;
+        while (seenNames.has(uniqueName) || await fs.access(path.join(directory, `${uniqueName}${ext}`)).then(() => true).catch(() => false)) {
+          uniqueName = `${finalName}-duplicate-${counter}`;
           counter++;
         }
         seenNames.add(uniqueName);
