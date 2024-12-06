@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import axios from 'axios';
+import path from 'path';
 
 async function toKebabCase(str: string): Promise<string> {
   return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -46,32 +47,52 @@ async function getDailyLeetcodeChallenge() {
     const kebabTitle = await toKebabCase(title);
 
     const extensions: { [key: string]: string } = {
-      c: 'c',
-      java: 'java',
-      go: 'go',
-      dart: 'dart',
-      javascript: 'js',
-      'c++': 'cpp',
-      'c#': 'cs',
-      typescript: 'ts',
-      php: 'php',
-      rust: 'rs',
       python: 'py',
+      typescript: 'ts',
+      javascript: 'js',
+      java: 'java',
+      cpp: 'cpp',
+      c: 'c',
+      csharp: 'cs',
+      dart: 'dart',
+      php: 'php',
+      go: 'go',
+      rust: 'rs',
+      ruby: 'rb',
+      swift: 'swift',
       kotlin: 'kt',
     };
 
+    const existingFiles: string[] = [];
+    const createdFiles: string[] = [];
+
     for (const [key, value] of Object.entries(extensions)) {
-      const dirPath = `${key}/${difficulty.toLowerCase()}`;
-      const filePath = `${dirPath}/${kebabTitle}.${value}`;
+      const dirPath = path.join(key, difficulty.toLowerCase());
+      const filePath = path.join(dirPath, `${kebabTitle}.${value}`);
 
-      console.log(`Creating directory: ${dirPath}`);
-      await fs.mkdir(dirPath, { recursive: true });
-
-      console.log(`Creating file: ${filePath}`);
-      await fs.writeFile(filePath, '');
+      try {
+        await fs.access(filePath);
+        existingFiles.push(filePath);
+        console.log(`File already exists: ${filePath}`);
+      } catch {
+        await fs.mkdir(dirPath, { recursive: true });
+        await fs.writeFile(filePath, '');
+        createdFiles.push(filePath);
+        console.log(`Created file: ${filePath}`);
+      }
     }
 
-    console.log(`Successfully created challenge files`);
+    if (existingFiles.length > 0) {
+      console.log('\nExisting Challenge Files:');
+      existingFiles.forEach(file => console.log(file));
+    }
+
+    if (createdFiles.length > 0) {
+      console.log('\nNewly Created Challenge Files:');
+      createdFiles.forEach(file => console.log(file));
+    }
+
+    console.log(`Successfully processed challenge files`);
   } catch (error) {
     console.error('Error: Failed to fetch daily LeetCode challenge', error);
   }
