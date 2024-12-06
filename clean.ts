@@ -16,6 +16,10 @@ class FilenameCleaner {
       .toLowerCase();
   }
 
+  private static isKebabCase(str: string): boolean {
+    return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(str);
+  }
+
   private static toRoman(num: number): string {
     if (num <= 0) return '';
     const romanNumerals: [string, number][] = [
@@ -47,6 +51,11 @@ class FilenameCleaner {
         const parts = baseName.split('.');
         const namePart = parts.slice(1).join('.'); 
         const kebabName = this.toKebabCase(namePart);
+
+        if (this.isKebabCase(baseName)) {
+          console.log(`Skipping already kebab-case file: ${file}`);
+          continue;
+        }
 
         const postfixMatch = kebabName.match(/-(\d+)$/);
         let finalName = kebabName;
