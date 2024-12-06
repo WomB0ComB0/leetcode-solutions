@@ -93,4 +93,14 @@ async function main() {
   await createSortedFiles(problems);
 }
 
-main();
+class Problems {
+  static async run() {
+    await main();
+  }
+}
+
+if (require.main === module) {
+  Problems.run().catch(console.error);
+}
+
+export default Problems;

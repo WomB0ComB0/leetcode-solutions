@@ -98,6 +98,14 @@ async function getDailyLeetcodeChallenge() {
   }
 }
 
-if (require.main === module) {
-  getDailyLeetcodeChallenge();
+class Daily {
+  static async run() {
+    await getDailyLeetcodeChallenge();
+  }
 }
+
+if (require.main === module) {
+  Daily.run().catch(console.error);
+}
+
+export default Daily;
