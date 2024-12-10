@@ -6,11 +6,10 @@
   "scripts": {
     "test": "jest",
     "tdd": "jest --watchAll",
-    "setup": "node ./setup.js",
-    "readme": "node ./update-readme.js",
-    "bench": "node ./bench.js",
-    "format": "prettier . --write --ignore-unknown",
-    "lint": "prettier . --check --ignore-unknown"
+    "question": "bun run question.ts",
+    "move": "bun run move.ts",
+    "clean": "bun run clean.ts",
+    "daily": "bun run daily.ts"
   },
   "prettier": {
     "semi": false,
@@ -52,6 +51,7 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
-    "date-fns": "^2.30.0"
+    "date-fns": "^2.30.0",
+    "ts-node": "^10.9.2"
   }
 }

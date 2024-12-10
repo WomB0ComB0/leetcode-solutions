@@ -56,7 +56,7 @@ class ProblemSorter {
       `,
       variables: {
         categorySlug: '',
-        limit: 3500, // Increased slightly for buffer
+        limit: 3500,
         skip: 0,
         filters: {},
       },

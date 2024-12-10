@@ -1,5 +1,5 @@
 /**
- * @fileoverview Fetches and processes the daily LeetCode challenge, creating solution files across multiple languages
+ * @fileoverview Fetches and processes the  daily LeetCode challenge, creating solution files across multiple languages
  */
 
 import { promises as fs } from 'fs';
