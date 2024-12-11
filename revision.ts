@@ -2,8 +2,8 @@
  * @fileoverview Revises LeetCode solution filenames to include question IDs as prefixes, using concurrent operations
  */
 
-import { promises as fs } from 'fs';
-import path from 'path';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
 import axios from 'axios';
 
 interface QuestionData {
