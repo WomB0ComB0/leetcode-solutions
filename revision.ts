@@ -97,11 +97,6 @@ async function processFile(file: string, langDir: string, difficulty: string, ex
   
   try {
     const titleSlug = file.replace(`.${extension}`, '');
-    if (/^\d+/.test(file)) {
-      console.log(`Skipping ${file} as it already has a question ID prefix`);
-      return;
-    }
-
     const questionData = await fetchQuestionData(titleSlug);
     
     const expectedDir = questionData.difficulty.toLowerCase();
@@ -141,12 +136,13 @@ async function processDirectory(langDir: string, difficulty: string, extension: 
       file.endsWith(`.${extension}`) && file !== 'revision.ts'
     );
 
+    // Collect all file processing promises
+    const fileProcessingPromises = relevantFiles.map(file => processFile(file, langDir, difficulty, extension));
+
     // Process files in chunks to control concurrency
-    for (let i = 0; i < relevantFiles.length; i += MAX_CONCURRENT_REQUESTS) {
-      const chunk = relevantFiles.slice(i, i + MAX_CONCURRENT_REQUESTS);
-      await Promise.all(
-        chunk.map(file => processFile(file, langDir, difficulty, extension))
-      );
+    for (let i = 0; i < fileProcessingPromises.length; i += MAX_CONCURRENT_REQUESTS) {
+      const chunk = fileProcessingPromises.slice(i, i + MAX_CONCURRENT_REQUESTS);
+      await Promise.all(chunk);
     }
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code !== 'ENOENT') {
@@ -199,9 +195,7 @@ class Revision {
 
 // Execute if this is the main module
 if (require.main === module) {
-  for (let i: number = 0; i < 10; i ++) {
-    Revision.run().catch(console.error);
-  }
+  Revision.run().catch(console.error);
 }
 
 export default Revision;
