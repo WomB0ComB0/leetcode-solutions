@@ -1,76 +1,7 @@
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import path from 'path';
-
-/**
- * Interface representing a LeetCode problem returned from the API
- * @interface
- */
-interface LeetCodeProblem {
-  /** The title of the problem */
-  title: string;
-  /** The difficulty level (Easy, Medium, Hard) */
-  difficulty: string;
-  /** The URL-friendly slug version of the title */
-  titleSlug: string;
-}
-
-/**
- * Fetches the list of problems from LeetCode's GraphQL API
- * @returns {Promise<LeetCodeProblem[]>} Array of LeetCode problems with title, difficulty and slug
- * @throws {Error} If the API request fails
- */
-async function fetchProblems(): Promise<LeetCodeProblem[]> {
-  const url = 'https://leetcode.com/graphql';
-  const query = {
-    query: `
-      query problemsetQuestionList($categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput) {
-        problemsetQuestionList: questionList(
-          categorySlug: $categorySlug
-          limit: $limit
-          skip: $skip
-          filters: $filters
-        ) {
-          questions: data {
-            title
-            difficulty
-            titleSlug
-          }
-        }
-      }
-    `,
-    variables: {
-      categorySlug: '',
-      limit: 3374,
-      skip: 0,
-      filters: {},
-    },
-  };
-
-  try {
-    const response = await axios.post(url, query, {
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      },
-    });
-
-    return response.data.data.problemsetQuestionList.questions;
-  } catch (error) {
-    console.error('Error fetching problems:', error);
-    return [];
-  }
-}
-
-/**
- * Sorts an array of LeetCode problems by difficulty level
- * @param {LeetCodeProblem[]} problems - Array of problems to sort
- * @returns {Promise<void>}
- */
-async function sortProblemsByDifficulty(problems: LeetCodeProblem[]): Promise<void> {
-  const difficultyOrder = ['Easy', 'Medium', 'Hard'];
-  problems.sort((a, b) => difficultyOrder.indexOf(a.difficulty) - difficultyOrder.indexOf(b.difficulty));
-}
+import { createInterface } from 'readline';
 
 /**
  * Interface mapping programming languages to their file extensions
@@ -80,48 +11,126 @@ interface LanguageExtensions {
   [key: string]: string;
 }
 
-/**
- * Creates empty solution files for each problem across multiple programming languages
- * @param {LeetCodeProblem[]} problems - Array of problems to create files for
- * @returns {Promise<void>}
- * @throws {Error} If file operations fail
- */
-async function createSortedFiles(problems: LeetCodeProblem[]): Promise<void> {
-  const languages: LanguageExtensions = {
-    python: 'py',
-    typescript: 'ts',
-    javascript: 'js',
-    java: 'java',
-    cpp: 'cpp',
-    c: 'c',
-    dart: 'dart',
-    php: 'php',
-    csharp: 'cs',
-    go: 'go',
-    rust: 'rs',
-    ruby: 'rb',
-    swift: 'swift',
-    kotlin: 'kt',
-  };
+interface CodeSnippet {
+  lang: string;
+  langSlug: string;
+  code: string;
+}
 
-  for (const problem of problems) {
-    const kebabTitle = problem.titleSlug;
-    const difficulty = problem.difficulty.toLowerCase();
+interface ProblemDetails {
+  content: string;
+  codeSnippets: CodeSnippet[];
+  difficulty: string;
+  questionId: string;
+  questionFrontendId: string;
+}
 
-    for (const [language, extension] of Object.entries(languages)) {
-      const dirPath = `${language}/${difficulty}`;
-      const filePath = `${dirPath}/${kebabTitle}.${extension}`;
+async function fetchProblemDetails(titleSlug: string): Promise<ProblemDetails | null> {
+  const url = 'https://leetcode.com/graphql';
 
-      try {
-        await fs.access(filePath);
-        console.log(`File already exists, skipping: ${filePath}`);
-      } catch {
-        await fs.mkdir(dirPath, { recursive: true });
-        await fs.writeFile(filePath, '');
-        console.log(`Created file: ${filePath}`);
-      }
-    }
+  try {
+    const [contentResponse, snippetsResponse, problemInfoResponse] = await Promise.all([
+      axios.post(url, {
+        query: `
+          query questionContent($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+              content
+              mysqlSchemas
+            }
+          }
+        `,
+        variables: { titleSlug }
+      }),
+      axios.post(url, {
+        query: `
+          query questionEditorData($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+              questionId
+              questionFrontendId
+              codeSnippets {
+                lang
+                langSlug
+                code
+              }
+            }
+          }
+        `,
+        variables: { titleSlug }
+      }),
+      axios.post(url, {
+        query: `
+          query questionInfo($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+              difficulty
+              questionId
+              questionFrontendId
+            }
+          }
+        `,
+        variables: { titleSlug }
+      })
+    ]);
+
+    return {
+      content: contentResponse.data.data.question.content,
+      codeSnippets: snippetsResponse.data.data.question.codeSnippets,
+      difficulty: problemInfoResponse.data.data.question.difficulty,
+      questionId: problemInfoResponse.data.data.question.questionId,
+      questionFrontendId: problemInfoResponse.data.data.question.questionFrontendId
+    };
+  } catch (error) {
+    console.error(`Error fetching details for ${titleSlug}:`, error);
+    return null;
   }
+}
+
+function formatProblemFile(language: string, problemContent: string, code: string): string {
+  const htmlToComment = (html: string) => {
+    const text = html
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&');
+
+    const commentMap: { [key: string]: [string, string] } = {
+      python: ['"""', '"""'],
+      typescript: ['/*', '*/'],
+      javascript: ['/*', '*/'],
+      java: ['/*', '*/'],
+      cpp: ['/*', '*/'],
+      c: ['/*', '*/'],
+      csharp: ['/*', '*/'],
+      dart: ['/*', '*/'],
+      php: ['/*', '*/'],
+      go: ['/*', '*/'],
+      rust: ['/*', '*/'],
+      ruby: ['=begin', '=end'],
+      swift: ['/*', '*/'],
+      kotlin: ['/*', '*/'],
+    };
+
+    const [start, end] = commentMap[language] || ['/*', '*/'];
+    return `${start}\n${text.trim()}\n${end}\n\n`;
+  }
+
+  return `${htmlToComment(problemContent)}${code}`;
+}
+
+async function promptYesNo(question: string): Promise<boolean> {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise((resolve) => {
+    rl.question(`${question} (y/n): `, (answer) => {
+      rl.close();
+      resolve(answer.toLowerCase().startsWith('y'));
+    });
+  });
 }
 
 /**
@@ -129,9 +138,73 @@ async function createSortedFiles(problems: LeetCodeProblem[]): Promise<void> {
  * @returns {Promise<void>}
  */
 async function main(): Promise<void> {
-  const problems = await fetchProblems();
-  await sortProblemsByDifficulty(problems);
-  await createSortedFiles(problems);
+  const titleSlug = Bun.argv[2];
+
+  if (!titleSlug) {
+    console.error('Please provide a problem slug as an argument');
+    console.error('Example: bun problems.ts two-sum');
+    process.exit(1);
+  }
+
+  try {
+    const details = await fetchProblemDetails(titleSlug);
+    if (!details) {
+      console.error(`Failed to fetch details for problem: ${titleSlug}`);
+      process.exit(1);
+    }
+
+    const languages: LanguageExtensions = {
+      python: 'py',
+      typescript: 'ts',
+      javascript: 'js',
+      java: 'java',
+      cpp: 'cpp',
+      c: 'c',
+      dart: 'dart',
+      php: 'php',
+      csharp: 'cs',
+      go: 'go',
+      rust: 'rs',
+      ruby: 'rb',
+      swift: 'swift',
+      kotlin: 'kt',
+    };
+
+    const difficulty = details.difficulty.toLowerCase();
+    const fileName = `${details.questionFrontendId}-${titleSlug}`;
+
+    console.log(`Creating files for problem: ${fileName} (${details.difficulty})`);
+
+    for (const [language, extension] of Object.entries(languages)) {
+      const dirPath = path.join(language, difficulty);
+      const modifiedFileName = language === 'dart'
+        ? `${details.questionId}_${titleSlug.replace(/-/g, '_')}.${extension}`
+        : `${fileName}.${extension}`;
+      const filePath = path.join(dirPath, modifiedFileName);
+
+      try {
+        await fs.access(filePath);
+        const shouldReplace = await promptYesNo(`File already exists: ${filePath}. Replace it?`);
+
+        if (!shouldReplace) {
+          console.log(`Skipping: ${filePath}`);
+          continue;
+        }
+      } catch {
+        // File doesn't exist, continue with creation
+      }
+
+      await fs.mkdir(dirPath, { recursive: true });
+      const snippet = details.codeSnippets.find(s => s.langSlug === language);
+      const content = formatProblemFile(language, details.content, snippet?.code || '');
+
+      await fs.writeFile(filePath, content);
+      console.log(`Created file: ${filePath}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    process.exit(1);
+  }
 }
 
 /**
@@ -151,5 +224,3 @@ class Problems {
 if (require.main === module) {
   Problems.run().catch(console.error);
 }
-
-export default Problems;

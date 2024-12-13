@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 interface QuestionData {
   titleSlug: string;
@@ -62,13 +62,13 @@ async function fetchQuestionData(titleSlug: string): Promise<QuestionData> {
 
       return response.data.data.question;
     } catch (error) {
-      if (error.response && error.response.status === 429) {
+      if (error instanceof Error && error.message.includes('429')) {
         console.warn(`Rate limit hit for ${titleSlug}. Retrying in ${delayTime}ms...`);
         await delay(delayTime);
         delayTime *= 2; // Exponential backoff
         attempts++;
       } else {
-        console.error(`API request failed for ${titleSlug}:`, error.message);
+        console.error(`API request failed for ${titleSlug}:`, error);
         throw error;
       }
     }
@@ -89,7 +89,7 @@ async function processFile(file: string, langDir: string, difficulty: string, ex
     await fs.rename(sourcePath, targetPath);
     console.log(`Renamed: ${file} -> ${newFilename}`);
   } catch (error) {
-    console.error(`Error processing ${file}:`, error.message);
+    console.error(`Error processing ${file}:`, error instanceof Error ? error.message : String(error));
   }
 }
 
@@ -110,7 +110,7 @@ async function processAllLanguages(titleSlug: string, questionId: string) {
           await processFile(file, path.join(currentDir, lang), difficulty, ext, questionId);
         }
       } catch (error) {
-        if (error.code !== 'ENOENT') {
+        if (error instanceof Error && error.message.includes('ENOENT')) {
           console.error(`Error processing directory ${difficultyDir}:`, error.message);
         }
       }
@@ -143,7 +143,7 @@ class Revision {
             }
           }
         } catch (error) {
-          if (error.code !== 'ENOENT') {
+          if (error instanceof Error && error.message.includes('ENOENT')) {
             console.error(`Error processing directory ${difficultyDir}:`, error.message);
           }
         }
