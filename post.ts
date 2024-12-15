@@ -58,10 +58,30 @@ async function promptLanguages(languages: { [key: string]: string }): Promise<st
     });
 }
 
+const raysoLanguageMap: Record<string, string> = {
+    python: 'python',
+    typescript: 'typescript',
+    javascript: 'javascript',
+    java: 'java',
+    cpp: 'cpp',
+    c: 'c',
+    csharp: 'csharp',
+    dart: 'dart',
+    php: 'php',
+    go: 'golang',
+    rust: 'rust',
+    ruby: 'ruby',
+    swift: 'swift',
+    kotlin: 'kotlin'
+};
+
 async function generateCodeImage(options: RaysoOptions): Promise<Uint8Array> {
+
+    const raysoLanguage = raysoLanguageMap[options.language?.toLocaleLowerCase() ?? ''] || 'auto'
+
     try {
         return generateRaySoImage(options.code, {
-            language: options.language,
+            language: raysoLanguage,
             title: options.title,
             theme: options.theme,
             darkMode: options.darkMode,
@@ -94,7 +114,12 @@ async function processCodeFile(
 
         console.log(`\nGenerating images for: ${selectedLanguages.join(', ')}`);
 
-        const socialPoster = new SocialPoster(config);
+        const socialPoster = new SocialPoster({
+            bluesky: {
+                handle: '',
+                password: ''
+            }
+        });
         await socialPoster.init();
 
         for (const lang of selectedLanguages) {

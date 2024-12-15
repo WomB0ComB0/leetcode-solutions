@@ -10,7 +10,8 @@
     "clean": "bun clean.ts",
     "daily": "bun daily.ts",
     "problems": "bun problems.ts",
-    "lint": "bunx biome check --write ./typescript/**/*.ts ./javascript/**/*.ts || true"
+    "lint": "bunx biome check --write ./typescript/**/*.ts ./javascript/**/*.ts || true",
+    "post": "bun post.ts"
   },
   "keywords": [],
   "license": "MIT",
@@ -34,6 +35,7 @@
     "@atproto/api": "^0.13.20",
     "axios": "^1.7.9",
     "date-fns": "^2.30.0",
+    "dotenv": "^16.4.7",
     "ts-node": "^10.9.2"
   }
 }
