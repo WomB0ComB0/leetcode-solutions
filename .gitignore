@@ -371,3 +371,5 @@ replay_pid*
 node_modules/
 klint
 nul
+
+.fake

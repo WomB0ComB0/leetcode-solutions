@@ -68,23 +68,24 @@ function formatProblemFile(language: string, problemContent: string, code: strin
  * Fetches the daily LeetCode challenge and creates solution files in multiple languages
  * @throws {Error} If the API request fails or file operations fail
  */
-async function getDailyLeetcodeChallenge() {
+async function getDailyLeetcodeChallenge(): Promise<void> {
     const url = 'https://leetcode.com/graphql';
 
     try {
         const dailyQuery = await axios.post(url, {
             query: `
-        query questionOfToday {
-          activeDailyCodingChallengeQuestion {
-            question {
-              questionId
-              title
-              titleSlug
-              difficulty
+                query questionOfToday {
+                    activeDailyCodingChallengeQuestion {
+                        question {
+                            questionId
+                            title
+                            titleSlug
+                            difficulty
+                        }
+                    }
+                }
             }
-          }
-        }
-      `
+        `
         }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -98,27 +99,27 @@ async function getDailyLeetcodeChallenge() {
         const [contentResponse, snippetsResponse] = await Promise.all([
             axios.post(url, {
                 query: `
-          query questionContent($titleSlug: String!) {
-            question(titleSlug: $titleSlug) {
-              content
-              mysqlSchemas
-            }
-          }
-        `,
+                    query questionContent($titleSlug: String!) {
+                        question(titleSlug: $titleSlug) {
+                            content
+                            mysqlSchemas
+                        }
+                    }
+                `,
                 variables: { titleSlug }
             }),
             axios.post(url, {
                 query: `
-          query questionEditorData($titleSlug: String!) {
-            question(titleSlug: $titleSlug) {
-              codeSnippets {
-                lang
-                langSlug
-                code
-              }
-            }
-          }
-        `,
+                    query questionEditorData($titleSlug: String!) {
+                        question(titleSlug: $titleSlug) {
+                            codeSnippets {
+                                lang
+                                langSlug
+                                code
+                            }
+                        }
+                    }
+                `,
                 variables: { titleSlug }
             })
         ]);
@@ -211,7 +212,7 @@ class Daily {
      * @async
      * @returns {Promise<void>}
      */
-    static async run() {
+    static async run(): Promise<void> {
         await getDailyLeetcodeChallenge();
     }
 }

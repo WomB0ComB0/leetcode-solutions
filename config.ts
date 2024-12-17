@@ -1,16 +1,11 @@
-export const config = {
-    twitter: {
-        apiKey: process.env.TWITTER_API_KEY,
-        apiSecret: process.env.TWITTER_API_SECRET,
-        accessToken: process.env.TWITTER_ACCESS_TOKEN,
-        accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-    },
+export const config: {
     bluesky: {
-        handle: process.env.BLUESKY_HANDLE,
-        password: process.env.BLUESKY_PASSWORD
+        handle: string;
+        password: string;
+    };
+} = {
+    bluesky: {
+        handle: process.env.BLUESKY_HANDLE || (() => { throw new Error('BLUESKY_HANDLE is not set'); })(),
+        password: process.env.BLUESKY_PASSWORD || (() => { throw new Error('BLUESKY_PASSWORD is not set'); })()
     },
-    linkedin: {
-        accessToken: process.env.LINKEDIN_ACCESS_TOKEN,
-        userId: process.env.LINKEDIN_USER_ID
-    }
 };

@@ -14,7 +14,8 @@
         "resolveJsonModule": true
     },
     "include": [
-        "**/*.ts"
+        "**/*.ts",
+        "env.d.ts"
     ],
     "exclude": [
         "node_modules",

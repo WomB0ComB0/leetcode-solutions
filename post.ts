@@ -1,4 +1,12 @@
-import axios from 'axios';
+/**
+ * @file post.ts
+ * @fileoverview Generates code images and posts them to social media platforms.
+ * @param {string} filePath - Path to the source code file
+ * @param {Record<string, string>} languages - Map of language names to file extensions
+ * @returns {Promise<void>}
+ */
+
+
 import { createInterface } from 'readline';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -64,9 +72,9 @@ const raysoLanguageMap: Record<string, string> = {
     javascript: 'javascript',
     java: 'java',
     cpp: 'cpp',
-    c: 'c',
+    c: 'plaintext',
     csharp: 'csharp',
-    dart: 'dart',
+    dart: 'plaintext',
     php: 'php',
     go: 'golang',
     rust: 'rust',
@@ -76,12 +84,11 @@ const raysoLanguageMap: Record<string, string> = {
 };
 
 async function generateCodeImage(options: RaysoOptions): Promise<Uint8Array> {
-
-    const raysoLanguage = raysoLanguageMap[options.language?.toLocaleLowerCase() ?? ''] || 'auto'
-
     try {
+        const language = options.language;
+        const validLanguage = raysoLanguageMap[language as string] || 'plaintext';
         return generateRaySoImage(options.code, {
-            language: raysoLanguage,
+            language: validLanguage,
             title: options.title,
             theme: options.theme,
             darkMode: options.darkMode,
@@ -100,7 +107,6 @@ async function processCodeFile(
 ): Promise<void> {
     try {
         await fs.access(filePath);
-        const fileContent = await fs.readFile(filePath, 'utf-8');
         const fileName = path.basename(filePath);
         const difficulty = path.basename(path.dirname(filePath));
         const problemName = path.parse(fileName).name;
@@ -116,8 +122,8 @@ async function processCodeFile(
 
         const socialPoster = new SocialPoster({
             bluesky: {
-                handle: '',
-                password: ''
+                handle: config.bluesky.handle,
+                password: config.bluesky.password
             }
         });
         await socialPoster.init();
@@ -125,21 +131,35 @@ async function processCodeFile(
         for (const lang of selectedLanguages) {
             const langDir = path.join(lang, difficulty);
             const imagesDir = path.join(langDir, 'images');
-            const langFilePath = path.join(langDir, `${problemName}.${languages[lang]}`);
+            const langFilePath = path.join(langDir, `${lang === 'dart' ? problemName.replace(/-/g,'_') : problemName}.${languages[lang]}`);
 
             try {
                 await fs.access(langFilePath);
                 const langFileContent = await fs.readFile(langFilePath, 'utf-8');
+
+                console.log(`Read file ${langFilePath}`);
+                console.log(`File content length: ${langFileContent.length}`);
+                if (!langFileContent) {
+                    console.error('File content is empty');
+                    continue;
+                }
+
                 await fs.mkdir(imagesDir, { recursive: true });
 
                 const options: RaysoOptions = {
-                    code: langFileContent,
-                    language: lang,
+                    code: langFileContent.trim(),
+                    language: lang === 'dart' || lang == 'c' ? 'auto' : lang,
                     title: `${problemName} (${lang})`,
                     theme: 'candy',
                     darkMode: true,
-                    padding: 32
+                    padding: 32,
+                    background: true
                 };
+
+                console.log('Generated options:', {
+                    ...options,
+                    code: options.code.substring(0, 100) + '...'
+                });
 
                 const imageData = await generateCodeImage(options);
                 const imagePath = path.join(imagesDir, `${problemName}_${lang}.png`);
@@ -220,8 +240,8 @@ async function findFile(problemId: string): Promise<string | null> {
     return null;
 }
 
-async function main() {
-    const problemName = Bun.argv[2];
+async function main(): Promise<void> {
+    const problemName: string = Bun.argv[2];
 
     if (!problemName) {
         console.error('Please provide a problem name');
