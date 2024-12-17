@@ -5,7 +5,7 @@ Return the lexicographically largest repeatLimitedString possible.
 
 A string a is lexicographically larger than a string b if in the first position where a and b differ, string a has a letter that appears later in the alphabet than the corresponding letter in b. If the first min(a.length, b.length) characters do not differ, then the longer string is the lexicographically larger one.
 
- 
+
 Example 1:
 
 
@@ -25,7 +25,7 @@ Example 2:
 
 Input: s = "aababab", repeatLimit = 2
 Output: "bbabaa"
-Explanation: We use only some of the characters from s to construct the repeatLimitedString "bbabaa". 
+Explanation: We use only some of the characters from s to construct the repeatLimitedString "bbabaa".
 The letter 'a' appears at most 2 times in a row.
 The letter 'b' appears at most 2 times in a row.
 Hence, no letter appears more than repeatLimit times in a row and the string is a valid repeatLimitedString.
@@ -33,7 +33,7 @@ The string is the lexicographically largest repeatLimitedString possible so we r
 Note that the string "bbabaaa" is lexicographically larger but the letter 'a' appears more than 2 times in a row, so it is not a valid repeatLimitedString.
 
 
- 
+
 Constraints:
 
 
@@ -47,5 +47,33 @@ Constraints:
  * @return {string}
  */
 var repeatLimitedString = function(s, repeatLimit) {
-    
+	const freq = Array(26).fill(0);
+
+	for (const c of s) {
+        freq[c.charCodeAt(0) - 'a'.charCodeAt(0)]++;
+    }
+
+    let pendingLetterIndex = -1;
+    const sb = [];
+
+    for (let i = 25; i >= 0; i--) {
+        if (freq[i] === 0) continue;
+
+        if (pendingLetterIndex > 0) {
+            sb.push(String.fromCharCode('a'.charCodeAt(0) + i));
+            freq[i]--;
+            i = pendingLetterIndex;
+            pendingLetterIndex = -1;
+        } else {
+            for (let j = 0; j < repeatLimit && freq[i] > 0; j++, freq[i]--) {
+                sb.push(String.fromCharCode('a'.charCodeAt(0) + i));
+            }
+
+            if (freq[i] > 0) {
+                pendingLetterIndex = i + 1;
+            }
+        }
+    }
+
+    return sb.join('');
 };
