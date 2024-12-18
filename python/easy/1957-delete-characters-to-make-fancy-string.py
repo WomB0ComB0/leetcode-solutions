@@ -8,10 +8,10 @@ class Solution:
 
         Returns:
           str: The resulting fancy string.
-      """
+        """
         result = []
         for char in s:
             if len(result) >= 2 and result[-1] == result[-2] == char:
                 continue
             result.append(char)
-        return ''.join(result)
+        return "".join(result)

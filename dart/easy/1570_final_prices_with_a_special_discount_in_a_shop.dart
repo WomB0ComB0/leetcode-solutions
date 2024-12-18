@@ -1,4 +1,4 @@
-=begin
+/*
 You are given an integer array prices where prices[i] is the price of the ith item in a shop.
 
 There is a special discount for items in the shop. If you buy the ith item, then you will receive a discount equivalent to prices[j] where j is the minimum index such that j > i and prices[j] <= prices[i]. Otherwise, you will not receive any discount at all.
@@ -39,10 +39,10 @@ Constraints:
 
 	1 <= prices.length <= 500
 	1 <= prices[i] <= 1000
-=end
+*/
 
-# @param {Integer[]} prices
-# @return {Integer[]}
-def final_prices(prices)
+class Solution {
+  List<int> finalPrices(List<int> prices) {
     
-end
+  }
+}

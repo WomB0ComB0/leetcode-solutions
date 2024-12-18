@@ -43,13 +43,17 @@ Constraints:
 
 from typing import Optional
 
+
 class ListNode:
     def __init__(self, val=0, next=None):
         self.val = val
         self.next = next
 
+
 class Solution:
-    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+    def addTwoNumbers(
+        self, l1: Optional[ListNode], l2: Optional[ListNode]
+    ) -> Optional[ListNode]:
         """
         :type l1: Optional[ListNode]
         :type l2: Optional[ListNode]
@@ -65,7 +69,7 @@ class Solution:
 
             val = v1 + v2 + carry
 
-            carry = val//10
+            carry = val // 10
             val = val % 10
 
             cur.next = ListNode(val)

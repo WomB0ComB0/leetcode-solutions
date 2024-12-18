@@ -3,6 +3,7 @@ from operator import xor
 from functools import partial
 from typing import List
 
+
 class Solution:
     def getMaximumXor(self, nums: List[int], maximumBit: int) -> List[int]:
         """
@@ -13,6 +14,6 @@ class Solution:
         Returns:
             List[int]: The result list of maximum XOR values.
         """
-        return [
-            *map(partial(xor, (1 << maximumBit) - 1), list(accumulate(nums, xor)))
-        ][::-1]
+        return [*map(partial(xor, (1 << maximumBit) - 1), list(accumulate(nums, xor)))][
+            ::-1
+        ]

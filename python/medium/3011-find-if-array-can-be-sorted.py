@@ -1,6 +1,7 @@
 from typing import List
 from functools import cmp_to_key
 
+
 class Solution:
     def canSortArray(self, nums: List[int]) -> bool:
         """
@@ -15,6 +16,7 @@ class Solution:
         Returns:
         bool: True if the array can be sorted in non-decreasing order using the custom comparison function, False otherwise.
         """
+
         def cmp(a, b):
             """
             Custom comparison function for sorting.
@@ -29,7 +31,7 @@ class Solution:
             if a.bit_count() == b.bit_count():
                 return a - b
             return a > b
-        
+
         # cmp_to_key is a function that takes a comparison function and returns a key function
         nums.sort(key=cmp_to_key(cmp))
         for i in range(1, len(nums)):

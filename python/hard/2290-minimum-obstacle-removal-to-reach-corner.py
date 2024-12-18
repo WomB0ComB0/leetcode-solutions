@@ -2,26 +2,27 @@ import heapq
 from typing import List
 from math import inf
 
+
 class Solution:
     def minimumObstacles(self, grid: List[List[int]]) -> int:
         """
         Finds the minimum number of obstacles that need to be removed to reach the bottom-right corner of a grid.
-        
+
         Uses Dijkstra's algorithm with a min heap to find the shortest path from top-left to bottom-right,
         where the weight of each edge is the value in the grid cell (0 for empty cell, 1 for obstacle).
-        
+
         Time Complexity: O(RC * log(RC)) where R is number of rows and C is number of columns
         Space Complexity: O(RC) for the cache and heap
-        
+
         Args:
             grid (List[List[int]]): A binary matrix where 0 represents empty cell and 1 represents obstacle
                                    grid[i][j] is either 0 or 1
                                    1 <= grid.length, grid[0].length <= 10^5
-                                   
+
         Returns:
             int: Minimum number of obstacles that must be removed to create a path from (0,0) to (R-1,C-1)
                  Returns -1 if no path exists
-                 
+
         Example:
             >>> minimumObstacles([[0,1,1],[1,1,0],[1,1,0]])
             2
