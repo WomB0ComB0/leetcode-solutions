@@ -387,7 +387,7 @@ async function getDailyLeetcodeChallenge(): Promise<void> {
             console.log('Daily Challenge (Puppeteer):', question);
 
 
-            await executeCommand('bun', ['run', 'problems', 'minimum-number-of-operations-to-move-all-balls-to-each-box', 'all', '--non-interactive'], process.cwd(), true);
+            await executeCommand('bun', ['./problems.ts', 'minimum-number-of-operations-to-move-all-balls-to-each-box', 'all', '--non-interactive'], process.cwd(), true);
         } catch (puppeteerError) {
             console.error('Puppeteer error:', puppeteerError);
             throw new Error('Both API and Puppeteer approaches failed');
