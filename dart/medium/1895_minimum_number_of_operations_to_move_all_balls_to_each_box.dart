@@ -35,8 +35,7 @@ Constraints:
 */
 
 class Solution {
-public:
-    vector<int> minOperations(string boxes) {
-        
-    }
-};
+  List<int> minOperations(String boxes) {
+    
+  }
+}
