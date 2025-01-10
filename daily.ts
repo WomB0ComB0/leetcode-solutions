@@ -369,9 +369,8 @@ async function getDailyLeetcodeChallenge(): Promise<void> {
             const question = puppeteerResult.data.activeDailyCodingChallengeQuestion.question;
             console.log('Daily Challenge (Puppeteer):', question);
 
-            console.log('Executing command...');
-            console.log(question.titleSlug);
-            await executeCommand('bun', ['run', 'problems', question.titleSlug, 'all', '--non-interactive'], process.cwd(), true);
+
+            await executeCommand('bun', ['run', 'problems', 'counting-words-with-a-given-prefix', 'all', '--non-interactive'], process.cwd(), true);
         } catch (puppeteerError) {
             console.error('Puppeteer error:', puppeteerError);
             throw new Error('Both API and Puppeteer approaches failed');
