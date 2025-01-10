@@ -119,7 +119,12 @@ function formatProblemFile(language: string, problemContent: string, code: strin
     return `${htmlToComment(problemContent)}${code}`;
 }
 
-async function promptYesNo(question: string): Promise<boolean> {
+async function promptYesNo(question: string, nonInteractive: boolean = false): Promise<boolean> {
+    if (nonInteractive) {
+        // Assume "yes" in non-interactive mode
+        return true;
+    }
+
     const rl = createInterface({
         input: process.stdin,
         output: process.stdout
@@ -140,6 +145,7 @@ async function promptYesNo(question: string): Promise<boolean> {
 async function main(): Promise<void> {
     const titleSlug = Bun.argv[2];
     const language = Bun.argv[3];
+    const nonInteractive = Bun.argv.includes('--non-interactive'); // Add a flag for non-interactive mode
 
     if (!titleSlug) {
         console.error('Please provide a problem slug as an argument');
@@ -177,8 +183,34 @@ async function main(): Promise<void> {
         console.log(`Creating files for problem: ${fileName} (${details.difficulty})`);
 
         if (!languages[language]) {
+            for (const [language, extension] of Object.entries(languages)) {
+                const dirPath = path.join(language, difficulty);
+                const modifiedFileName = language === 'dart'
+                    ? `${details.questionId}_${titleSlug.replace(/-/g, '_')}.${extension}`
+                    : `${fileName}.${extension}`;
+                const filePath = path.join(dirPath, modifiedFileName);
 
-        for (const [language, extension] of Object.entries(languages)) {
+                try {
+                    await fs.access(filePath);
+                    const shouldReplace = await promptYesNo(`File already exists: ${filePath}. Replace it?`, nonInteractive);
+
+                    if (!shouldReplace) {
+                        console.log(`Skipping: ${filePath}`);
+                        continue;
+                    }
+                } catch {
+                    // File doesn't exist, continue with creation
+                }
+
+                await fs.mkdir(dirPath, { recursive: true });
+                const snippet = details.codeSnippets.find(s => s.langSlug === language);
+                const content = formatProblemFile(language, details.content, snippet?.code || '');
+
+                await fs.writeFile(filePath, content);
+                console.log(`Created file: ${filePath}`);
+            }
+        } else {
+            const extension = languages[language];
             const dirPath = path.join(language, difficulty);
             const modifiedFileName = language === 'dart'
                 ? `${details.questionId}_${titleSlug.replace(/-/g, '_')}.${extension}`
@@ -187,42 +219,15 @@ async function main(): Promise<void> {
 
             try {
                 await fs.access(filePath);
-                const shouldReplace = await promptYesNo(`File already exists: ${filePath}. Replace it?`);
+                const shouldReplace = await promptYesNo(`File already exists: ${filePath}. Replace it?`, nonInteractive);
 
                 if (!shouldReplace) {
                     console.log(`Skipping: ${filePath}`);
-                    continue;
                 }
             } catch {
                 // File doesn't exist, continue with creation
             }
-
-            await fs.mkdir(dirPath, { recursive: true });
-            const snippet = details.codeSnippets.find(s => s.langSlug === language);
-            const content = formatProblemFile(language, details.content, snippet?.code || '');
-
-            await fs.writeFile(filePath, content);
-            console.log(`Created file: ${filePath}`);
         }
-    } else {
-        const extension = languages[language];
-        const dirPath = path.join(language, difficulty);
-        const modifiedFileName = language === 'dart'
-            ? `${details.questionId}_${titleSlug.replace(/-/g, '_')}.${extension}`
-            : `${fileName}.${extension}`;
-        const filePath = path.join(dirPath, modifiedFileName);
-
-        try {
-            await fs.access(filePath);
-            const shouldReplace = await promptYesNo(`File already exists: ${filePath}. Replace it?`);
-
-            if (!shouldReplace) {
-                console.log(`Skipping: ${filePath}`);
-            }
-        } catch {
-            // File doesn't exist, continue with creation
-        }
-    }
     } catch (error) {
         console.error('Error:', error);
         process.exit(1);
