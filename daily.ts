@@ -375,7 +375,7 @@ async function getDailyLeetcodeChallenge(): Promise<void> {
             createdFiles.forEach((file) => console.log(file));
         }
 
-        // Execute command only once after all files are processed
+
         await executeCommand('bun', ['run', 'problems', question.titleSlug, 'all'], process.cwd(), true);
     } catch (initialError) {
         console.error('Direct API call failed:', (initialError as Error).message);
@@ -386,7 +386,7 @@ async function getDailyLeetcodeChallenge(): Promise<void> {
             const question = puppeteerResult.data.activeDailyCodingChallengeQuestion.question;
             console.log('Daily Challenge (Puppeteer):', question);
 
-            await executeCommand('bun', ['run', 'problems', 'minimum-number-of-operations-to-move-all-balls-to-each-box', 'all', '--non-interactive'], `${process.cwd()}/leetcode-solutions`, true);
+            await executeCommand('bun', ['run', 'problems', question.titleSlug, 'all', '--non-interactive'], `${process.cwd()}/leetcode-solutions`, true);
         } catch (puppeteerError) {
             console.error('Puppeteer error:', puppeteerError);
             throw new Error('Both API and Puppeteer approaches failed');
