@@ -32,7 +32,7 @@ Constraints:
 */
 
 class Solution {
-    fun prefixCount(words: Array<String>, pref: String): Int {
-        
-    }
+  int prefixCount(List<String> words, String pref) {
+    
+  }
 }
