@@ -37,11 +37,16 @@ const executeCommand = async (
             if (code === 0) {
                 resolve();
             } else {
+                console.error(`Command failed: ${command} ${args.join(' ')}`);
+                console.error(`Exit code: ${code}`);
                 reject(new Error(`Command "${command} ${args.join(' ')}" failed with code ${code}`));
             }
         });
 
-        process.on('error', reject);
+        process.on('error', (err) => {
+            console.error('Process error:', err);
+            reject(err);
+        });
     });
 };
 
