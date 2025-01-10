@@ -29,8 +29,19 @@ const executeCommand = async (
 ): Promise<void> => {
     return new Promise((resolve, reject) => {
         const process = spawn(command, args, {
-            stdio: silent ? 'ignore' : 'inherit',
+            stdio: silent ? 'pipe' : 'inherit', // Capture output if silent
             cwd,
+        });
+
+        let output = '';
+        let errorOutput = '';
+
+        process.stdout?.on('data', (data) => {
+            output += data.toString();
+        });
+
+        process.stderr?.on('data', (data) => {
+            errorOutput += data.toString();
         });
 
         process.on('close', (code) => {
@@ -39,6 +50,8 @@ const executeCommand = async (
             } else {
                 console.error(`Command failed: ${command} ${args.join(' ')}`);
                 console.error(`Exit code: ${code}`);
+                console.error(`Output: ${output}`);
+                console.error(`Error output: ${errorOutput}`);
                 reject(new Error(`Command "${command} ${args.join(' ')}" failed with code ${code}`));
             }
         });
@@ -49,7 +62,6 @@ const executeCommand = async (
         });
     });
 };
-
 interface CodeSnippet {
     lang: string;
     langSlug: string;
