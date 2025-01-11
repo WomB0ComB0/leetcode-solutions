@@ -37,8 +37,7 @@ Constraints:
 */
 
 class Solution {
-public:
-    bool canConstruct(string s, int k) {
-        
-    }
-};
+  bool canConstruct(String s, int k) {
+    
+  }
+}
