@@ -52,11 +52,8 @@ Constraints:
 	locked[i] is either '0' or '1'.
 */
 
-/**
- * @param {string} s
- * @param {string} locked
- * @return {boolean}
- */
-var canBeValid = function(s, locked) {
+class Solution {
+  bool canBeValid(String s, String locked) {
     
-};
+  }
+}
