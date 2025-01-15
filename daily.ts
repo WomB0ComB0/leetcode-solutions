@@ -62,6 +62,7 @@ const executeCommand = async (
         });
     });
 };
+
 interface CodeSnippet {
     lang: string;
     langSlug: string;
@@ -143,7 +144,8 @@ async function fetchCsrfToken(): Promise<string> {
  * @returns {Promise<any>} The daily challenge details
  */
 async function getDailyLeetcodeChallengeWithPuppeteer(): Promise<any> {
-    const browser = await puppeteer.launch({ headless: false });
+    // Launch Puppeteer in headless mode
+    const browser = await puppeteer.launch({ headless: true }); // <-- Add this
     const page = await browser.newPage();
 
     try {
@@ -182,7 +184,6 @@ async function getDailyLeetcodeChallengeWithPuppeteer(): Promise<any> {
         await browser.close();
     }
 }
-
 /**
  * Checks if a file has non-comment content
  * @param {string} filePath - The path to the file
