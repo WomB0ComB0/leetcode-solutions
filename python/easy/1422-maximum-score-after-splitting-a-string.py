@@ -3,18 +3,18 @@ Given a string s of zeros and ones, return the maximum score after splitting the
 
 The score after splitting a string is the number of zeros in the left substring plus the number of ones in the right substring.
 
-
+ 
 Example 1:
 
 
 Input: s = "011101"
-Output: 5
-Explanation:
+Output: 5 
+Explanation: 
 All possible ways of splitting s into two non-empty substrings are:
-left = "0" and right = "11101", score = 1 + 4 = 5
-left = "01" and right = "1101", score = 1 + 3 = 4
-left = "011" and right = "101", score = 1 + 2 = 3
-left = "0111" and right = "01", score = 1 + 1 = 2
+left = "0" and right = "11101", score = 1 + 4 = 5 
+left = "01" and right = "1101", score = 1 + 3 = 4 
+left = "011" and right = "101", score = 1 + 2 = 3 
+left = "0111" and right = "01", score = 1 + 1 = 2 
 left = "01110" and right = "1", score = 2 + 1 = 3
 
 
@@ -33,15 +33,13 @@ Input: s = "1111"
 Output: 3
 
 
-
+ 
 Constraints:
 
 
 	2 <= s.length <= 500
 	The string s consists of characters '0' and '1' only.
 """
-from typing import List
-
 
 class Solution(object):
     def maxScore(self, s):
@@ -49,9 +47,4 @@ class Solution(object):
         :type s: str
         :rtype: int
         """
-        max_sum: int = 0
-        for i in range(1, len(s)):
-            left: List[str] = s[:i]
-            right: List[str] = s[i:]
-            max_sum = max(max_sum, left.count('0') + right.count('1'))
-        return max_sum
+        

@@ -144,24 +144,29 @@ async function fetchCsrfToken(): Promise<string> {
  * @returns {Promise<any>} The daily challenge details
  */
 async function getDailyLeetcodeChallengeWithPuppeteer(): Promise<any> {
-    // Launch Puppeteer in headless mode
-    const browser = await puppeteer.launch({ headless: true }); // <-- Add this
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     try {
         console.log('Navigating to LeetCode...');
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
         await page.goto('https://leetcode.com/problemset/all/', { waitUntil: 'networkidle2' });
 
+        // Log the page content for debugging
+        const pageContent = await page.content();
+        console.log(pageContent);
+
+        // Take a screenshot for debugging
+        await page.screenshot({ path: 'debug.png' });
+
         // Wait for the calendar to load
-        await page.waitForSelector('[href^="/problems/"][class*="h-8 w-8"]', { timeout: 5000 });
+        await page.waitForSelector('[href^="/problems/"][class*="h-8 w-8"]', { timeout: 10000 });
 
         console.log('Extracting daily challenge...');
         const dailyChallenge = await page.evaluate(() => {
-            // Find the element with the green background (current day)
-            const dailyChallengeElement = document.querySelector('[href^="/problems/"] span[class*="bg-green-s"]')?.closest('a');
+            const dailyChallengeElement = document.querySelector('[href^="/problems/"][class*="h-8 w-8"]')?.closest('a');
             if (!dailyChallengeElement) return null;
 
-            // Extract the problem slug from the href
             const href = dailyChallengeElement.getAttribute('href');
             const match = href?.match(/\/problems\/([^/]+)/);
             return match ? match[1] : null;
