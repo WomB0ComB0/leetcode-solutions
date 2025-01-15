@@ -153,8 +153,7 @@ async function getDailyLeetcodeChallengeWithPuppeteer(): Promise<any> {
         await page.goto('https://leetcode.com/problemset/all/', { waitUntil: 'networkidle2' });
 
         // Log the page content for debugging
-        const pageContent = await page.content();
-        console.log(pageContent);
+        // const pageContent = await page.content();
 
         // Take a screenshot for debugging
         await page.screenshot({ path: 'debug.png' });
