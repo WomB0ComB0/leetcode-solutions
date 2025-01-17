@@ -219,6 +219,7 @@ async function hasContent(filePath: string): Promise<boolean> {
  */
 async function getDailyLeetcodeChallenge(): Promise<void> {
     console.log('Fetching daily LeetCode challenge...');
+    console.log(`Current date: ${new Date().toISOString().split('T')[0]}`);
     const url = 'https://leetcode.com/graphql';
 
     try {
